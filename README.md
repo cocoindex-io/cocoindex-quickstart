@@ -7,6 +7,8 @@ Super easy to start, get your RAG data pipeline running in ~50 lines of python �
 
 ⭐ Please give [Cocoindex on Github](https://github.com/cocoindex-io/cocoindex) a star to support us if you like our work. Thank you so much with a warm coconut hug 🥥🤗. [![GitHub](https://img.shields.io/github/stars/cocoindex-io/cocoindex?color=5B5BD6)](https://github.com/cocoindex-io/cocoindex)
 
+⭐ Please give [Cocoindex on Github](https://github.com/cocoindex-io/cocoindex) a star to support us if you like our work. Thank you so much with a warm coconut hug 🥥. [![GitHub](https://img.shields.io/github/stars/cocoindex-io/cocoindex?color=5B5BD6)](https://github.com/cocoindex-io/cocoindex)
+
 Video tutorial with detailed explanation: [Cocoindex Quickstart Video Guide](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 
 ## Prerequisite
