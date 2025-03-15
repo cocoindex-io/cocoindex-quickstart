@@ -15,7 +15,7 @@ Video tutorial with detailed explanation: [Cocoindex Quickstart Video Guide](htt
 
 - Install CocoIndex
 ```bash
-pip install cocoindex
+pip install -U cocoindex
 ```
 
 -  Make sure you have specify the database URL by environment variable:
