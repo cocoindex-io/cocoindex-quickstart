@@ -11,7 +11,7 @@ Super easy to get your RAG data pipeline running in ~50 lines of python 🚀.
 Video tutorial with detailed explanation: [Cocoindex Quickstart Video Guide](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 
 ## Prerequisite
--[Install Postgres](https://cocoindex.io/docs/getting_started/installation#-install-postgres) if you don't have one.
+- [Install Postgres](https://cocoindex.io/docs/getting_started/installation#-install-postgres) if you don't have one.
 
 - Install CocoIndex
 ```bash
