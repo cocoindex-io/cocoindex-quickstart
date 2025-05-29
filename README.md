@@ -28,13 +28,13 @@ export COCOINDEX_DATABASE_URL="postgresql://cocoindex:cocoindex@localhost:5432/c
 Setup index:
 
 ```bash
-python quickstart.py cocoindex setup
+cocoindex setup quickstart.py
 ```
 
 Update index:
 
 ```bash
-python quickstart.py cocoindex update
+cocoindex update quickstart.py
 ```
 
 Run query:
