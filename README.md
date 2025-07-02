@@ -13,9 +13,9 @@ Video tutorial with detailed explanation: [Cocoindex Quickstart Video Guide](htt
 ## Prerequisite
 - [Install Postgres](https://cocoindex.io/docs/getting_started/installation#-install-postgres) if you don't have one.
 
-- Install CocoIndex
+- Install CocoIndex and other dependencies:
 ```bash
-pip install -U cocoindex
+pip install -U "cocoindex[embeddings]" "psycopg[binary,pool]" pgvector
 ```
 
 -  Make sure you have specify the database URL by environment variable:
@@ -25,16 +25,10 @@ export COCOINDEX_DATABASE_URL="postgresql://cocoindex:cocoindex@localhost:5432/c
 
 ## Run
 
-Setup index:
-
-```bash
-cocoindex setup quickstart.py
-```
-
 Update index:
 
 ```bash
-cocoindex update quickstart.py
+cocoindex update --setup quickstart.py
 ```
 
 Run query:
