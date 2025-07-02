@@ -1,7 +1,7 @@
 import cocoindex
-from dotenv import load_dotenv
 from psycopg_pool import ConnectionPool
 import os
+
 
 @cocoindex.transform_flow()
 def text_to_embedding(
@@ -17,11 +17,15 @@ def text_to_embedding(
         )
     )
 
-@cocoindex.flow_def(name="TextEmbedding")
-def text_embedding_flow(flow_builder: cocoindex.FlowBuilder, data_scope: cocoindex.DataScope):
+
+@cocoindex.flow_def(name="TextEmbeddingQuickStart")
+def text_embedding_flow(
+    flow_builder: cocoindex.FlowBuilder, data_scope: cocoindex.DataScope
+):
     # Add a data source to read files from a directory
     data_scope["documents"] = flow_builder.add_source(
-        cocoindex.sources.LocalFile(path="markdown_files"))
+        cocoindex.sources.LocalFile(path="markdown_files")
+    )
 
     # Add a collector for data to be exported to the vector index
     doc_embeddings = data_scope.add_collector()
@@ -31,7 +35,10 @@ def text_embedding_flow(flow_builder: cocoindex.FlowBuilder, data_scope: cocoind
         # Split the document into chunks, put into `chunks` field
         doc["chunks"] = doc["content"].transform(
             cocoindex.functions.SplitRecursively(),
-            language="javascript", chunk_size=300, chunk_overlap=100)
+            language="javascript",
+            chunk_size=300,
+            chunk_overlap=100,
+        )
 
         # Transform data of each chunk
         with doc["chunks"].row() as chunk:
@@ -39,8 +46,12 @@ def text_embedding_flow(flow_builder: cocoindex.FlowBuilder, data_scope: cocoind
             chunk["embedding"] = text_to_embedding(chunk["text"])
 
             # Collect the chunk into the collector.
-            doc_embeddings.collect(filename=doc["filename"], location=chunk["location"],
-                                   text=chunk["text"], embedding=chunk["embedding"])
+            doc_embeddings.collect(
+                filename=doc["filename"],
+                location=chunk["location"],
+                text=chunk["text"],
+                embedding=chunk["embedding"],
+            )
 
     # Export collected data to a vector index.
     doc_embeddings.export(
@@ -54,6 +65,7 @@ def text_embedding_flow(flow_builder: cocoindex.FlowBuilder, data_scope: cocoind
             )
         ],
     )
+
 
 def search(pool: ConnectionPool, query: str, top_k: int = 5):
     # Get the table name, for the export target in the text_embedding_flow above.
@@ -77,6 +89,7 @@ def search(pool: ConnectionPool, query: str, top_k: int = 5):
                 for row in cur.fetchall()
             ]
 
+
 def _main():
     # Initialize the database connection pool.
     pool = ConnectionPool(os.getenv("COCOINDEX_DATABASE_URL"))
@@ -94,7 +107,7 @@ def _main():
             print("---")
         print()
 
+
 if __name__ == "__main__":
-    load_dotenv()
     cocoindex.init()
     _main()
