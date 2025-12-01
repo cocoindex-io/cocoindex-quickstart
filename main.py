@@ -17,7 +17,7 @@ def text_embedding_flow(
         # Split the document into chunks, put into `chunks` field
         doc["chunks"] = doc["content"].transform(
             cocoindex.functions.SplitRecursively(),
-            language="javascript",
+            language="markdown",
             chunk_size=300,
             chunk_overlap=100,
         )
