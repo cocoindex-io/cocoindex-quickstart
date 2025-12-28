@@ -23,7 +23,7 @@ pip install -U "cocoindex[embeddings]"
 Update index:
 
 ```bash
-cocoindex update --setup main.py
+cocoindex update main.py
 ```
 
 Run query:
