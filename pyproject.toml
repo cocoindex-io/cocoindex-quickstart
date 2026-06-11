@@ -1,0 +1,12 @@
+[project]
+name = "cocoindex-quickstart"
+version = "0.1.0"
+description = "CocoIndex quickstart: convert PDFs to Markdown with incremental processing."
+requires-python = ">=3.11"
+dependencies = [
+    "cocoindex>=1.0.7",
+    "docling>=2.0.0",
+]
+
+[tool.setuptools]
+packages = []

@@ -1,53 +1,54 @@
-import cocoindex
+"""
+CocoIndex quickstart — convert PDFs to Markdown.
 
-@cocoindex.flow_def(name="TextEmbeddingQuickStart")
-def text_embedding_flow(
-    flow_builder: cocoindex.FlowBuilder, data_scope: cocoindex.DataScope
-):
-    # Add a data source to read files from a directory
-    data_scope["documents"] = flow_builder.add_source(
-        cocoindex.sources.LocalFile(path="markdown_files")
+Walk a folder of PDFs, convert each to Markdown with Docling, and write the
+result to ./out. Re-runs only reprocess the files that actually changed.
+
+Tutorial: https://cocoindex.io/docs/getting_started/quickstart/
+"""
+
+import pathlib
+
+import cocoindex as coco
+from cocoindex.connectors import localfs
+from cocoindex.resources.file import PatternFilePathMatcher
+from docling.datamodel.accelerator_options import AcceleratorDevice, AcceleratorOptions
+from docling.datamodel.base_models import InputFormat
+from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.document_converter import DocumentConverter, PdfFormatOption
+
+_pipeline_options = PdfPipelineOptions(
+    accelerator_options=AcceleratorOptions(device=AcceleratorDevice.CPU)
+)
+_converter = DocumentConverter(
+    format_options={
+        InputFormat.PDF: PdfFormatOption(pipeline_options=_pipeline_options)
+    }
+)
+
+
+@coco.fn(memo=True)
+def process_file(file: localfs.File, outdir: pathlib.Path) -> None:
+    markdown = _converter.convert(
+        file.file_path.resolve()
+    ).document.export_to_markdown()
+    outname = file.file_path.path.stem + ".md"
+    localfs.declare_file(outdir / outname, markdown, create_parent_dirs=True)
+
+
+@coco.fn
+async def app_main(sourcedir: pathlib.Path, outdir: pathlib.Path) -> None:
+    files = localfs.walk_dir(
+        sourcedir,
+        recursive=True,
+        path_matcher=PatternFilePathMatcher(included_patterns=["**/*.pdf"]),
     )
+    await coco.mount_each(process_file, files.items(), outdir)
 
-    # Add a collector for data to be exported to the vector index
-    doc_embeddings = data_scope.add_collector()
 
-    # Transform data of each document
-    with data_scope["documents"].row() as doc:
-        # Split the document into chunks, put into `chunks` field
-        doc["chunks"] = doc["content"].transform(
-            cocoindex.functions.SplitRecursively(),
-            language="markdown",
-            chunk_size=300,
-            chunk_overlap=100,
-        )
-
-        # Transform data of each chunk
-        with doc["chunks"].row() as chunk:
-            # Embed the chunk, put into `embedding` field (inlined transform)
-            chunk["embedding"] = chunk["text"].transform(
-                cocoindex.functions.SentenceTransformerEmbed(
-                    model="sentence-transformers/all-MiniLM-L6-v2"
-                )
-            )
-
-            # Collect the chunk into the collector.
-            doc_embeddings.collect(
-                filename=doc["filename"],
-                location=chunk["location"],
-                text=chunk["text"],
-                embedding=chunk["embedding"],
-            )
-
-    # Export collected data to a vector index.
-    doc_embeddings.export(
-        "doc_embeddings",
-        cocoindex.storages.Postgres(),
-        primary_key_fields=["filename", "location"],
-        vector_indexes=[
-            cocoindex.VectorIndexDef(
-                field_name="embedding",
-                metric=cocoindex.VectorSimilarityMetric.COSINE_SIMILARITY,
-            )
-        ],
-    )
+app = coco.App(
+    "PdfToMarkdown",
+    app_main,
+    sourcedir=pathlib.Path("./pdf_files"),
+    outdir=pathlib.Path("./out"),
+)
